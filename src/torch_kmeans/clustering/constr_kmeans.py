@@ -312,7 +312,7 @@ class ConstrainedKMeans(KMeans):
             # get cluster assignments
             c_assign = self._assign(x, centers, weights, k_mask)
             # update cluster centers
-            centers = group_by_label_mean(x, c_assign, k_max_range)
+            centers = group_by_label_mean(x, c_assign, old_centers, k_max_range)
             if self.tol is not None:
                 # calculate center shift
                 shift = self._calculate_shift(centers, old_centers, p=self.p_norm)

@@ -34,6 +34,7 @@ class ClusterResult(NamedTuple):
 def group_by_label_mean(
     x: Tensor,
     labels: Tensor,
+    old_centers: Tensor,
     k_max_range: Tensor,
 ) -> Tensor:
     """Group samples in x by label
@@ -64,7 +65,11 @@ def group_by_label_mean(
         .to(x.dtype)
     )
     M = F.normalize(M, p=1.0, dim=-1)
-    return torch.matmul(M, x[:, None, :, :].expand(bs, m, n, d))
+    new_centers = torch.matmul(M, x[:, None, :, :].expand(bs, m, n, d))
+    nan_mask = torch.isnan(new_centers)
+    new_centers = torch.where(nan_mask, old_centers, new_centers)
+    # return torch.matmul(M, x[:, None, :, :].expand(bs, m, n, d))
+    return new_centers
 
 
 @torch.jit.script
